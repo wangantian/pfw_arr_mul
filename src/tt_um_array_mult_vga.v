@@ -140,8 +140,8 @@ module tt_um_array_mult_vga (
   localparam BORDER      = 10'd3;
   
   localparam mult_gap    = 10'd20;
-  localparam bit_size    = 4'd4;
-  localparam bit_gap  = 4'd5;
+  localparam bit_size    = 10'd4;
+  localparam bit_gap  = 10'd5;
 
 
   // Text area inside card
@@ -166,13 +166,13 @@ module tt_um_array_mult_vga (
   wire in_text = (hpos >= TEXT_X0) && (hpos < TEXT_X1)
                && (vpos >= TEXT_Y0) && (vpos < TEXT_Y1);
   wire in_mul_array_x_bound = (hpos >= CARD_X0) && (hpos < CARD_X1);		   
-  wire in_mul_array0 = (vpos >= CARD_Y1 + mult_gap + 0*(bit_size+bit_gap)) && (vpos <= CARD_Y1 + mult_gap + 1*(bit_size));
-  wire in_mul_array1 = (vpos >= CARD_Y1 + mult_gap + 1*(bit_size+bit_gap)) && (vpos <= CARD_Y1 + mult_gap + 2*(bit_size));
-  wire in_mul_array2 = (vpos >= CARD_Y1 + mult_gap + 2*(bit_size+bit_gap)) && (vpos <= CARD_Y1 + mult_gap + 3*(bit_size));
-  wire in_mul_array3 = (vpos >= CARD_Y1 + mult_gap + 3*(bit_size+bit_gap)) && (vpos <= CARD_Y1 + mult_gap + 4*(bit_size));
-  wire in_mul_array4 = (vpos >= CARD_Y1 + mult_gap + 4*(bit_size+bit_gap)) && (vpos <= CARD_Y1 + mult_gap + 5*(bit_size));
-  wire in_mul_array5 = (vpos >= CARD_Y1 + mult_gap + 5*(bit_size+bit_gap)) && (vpos <= CARD_Y1 + mult_gap + 6*(bit_size));
-  wire in_mul_array6 = (vpos >= CARD_Y1 + mult_gap + 6*(bit_size+bit_gap)) && (vpos <= CARD_Y1 + mult_gap + 7*(bit_size));
+  wire in_mul_array0 = in_mul_array_x_bound & ((vpos >= CARD_Y1 + mult_gap + 0*(bit_size+bit_gap)) && (vpos <= CARD_Y1 + mult_gap + 1*(bit_size));
+  wire in_mul_array1 = in_mul_array_x_bound & (vpos >= CARD_Y1 + mult_gap + 1*(bit_size+bit_gap)) && (vpos <= CARD_Y1 + mult_gap + 2*(bit_size));
+  wire in_mul_array2 = in_mul_array_x_bound & (vpos >= CARD_Y1 + mult_gap + 2*(bit_size+bit_gap)) && (vpos <= CARD_Y1 + mult_gap + 3*(bit_size));
+  wire in_mul_array3 = in_mul_array_x_bound & (vpos >= CARD_Y1 + mult_gap + 3*(bit_size+bit_gap)) && (vpos <= CARD_Y1 + mult_gap + 4*(bit_size));
+  wire in_mul_array4 = in_mul_array_x_bound & (vpos >= CARD_Y1 + mult_gap + 4*(bit_size+bit_gap)) && (vpos <= CARD_Y1 + mult_gap + 5*(bit_size));
+  wire in_mul_array5 = in_mul_array_x_bound & (vpos >= CARD_Y1 + mult_gap + 5*(bit_size+bit_gap)) && (vpos <= CARD_Y1 + mult_gap + 6*(bit_size));
+  wire in_mul_array6 = in_mul_array_x_bound & (vpos >= CARD_Y1 + mult_gap + 6*(bit_size+bit_gap)) && (vpos <= CARD_Y1 + mult_gap + 7*(bit_size));
   
   // Position within the text grid
   wire [9:0] tx = hpos - TEXT_X0;
