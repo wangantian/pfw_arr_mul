@@ -33,14 +33,17 @@ module tt_um_array_mult_vga (
   // Input registers — directly connected to solder pads on the board
   // -----------------------------------------------------------------------
   reg [3:0] A_reg, B_reg;
+  reg [7:0] P_reg;
 
   always @(posedge clk) begin
     if (!rst_n) begin
       A_reg <= 4'b0;
       B_reg <= 4'b0;
+	  P_reg <= 8'b0;
     end else begin
       A_reg <= ui_in[3:0];
       B_reg <= ui_in[7:4];
+	  P_reg <= P;
     end
   end
 
@@ -81,7 +84,7 @@ module tt_um_array_mult_vga (
   wire [3:0] B_ones = (B_reg >= 4'd10) ? B_reg - 4'd10 : B_reg;
 
   // P (0–225): double-dabble algorithm
-  wire [11:0] P_bcd = bin_to_bcd(P);
+  wire [11:0] P_bcd = bin_to_bcd(P_reg);
   wire [3:0]  P_hundreds = P_bcd[11:8];
   wire [3:0]  P_tens     = P_bcd[7:4];
   wire [3:0]  P_ones     = P_bcd[3:0];
@@ -365,18 +368,4 @@ module tt_um_array_mult_vga (
 
   wire _unused = &{ena, uio_in, 1'b0};
 
-endmodule
-
-// -----------------------------------------------------------------------
-// Full Adder primitive
-// -----------------------------------------------------------------------
-module fa (
-    input  wire x,
-    input  wire y,
-    input  wire cin,
-    output wire s,
-    output wire cout
-);
-  assign s    = x ^ y ^ cin;
-  assign cout = (x & y) | (x & cin) | (y & cin);
 endmodule
