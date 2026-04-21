@@ -56,7 +56,7 @@ module tt_um_array_mult_vga (
   wire C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11;
   wire s1, s2, s3, s4, s5, s6;
 
-  assign P[0] = A_reg[0] & B_reg[0] & uio_in[0];
+  assign P[0] = A_reg[0] & B_reg[0];
 
   fa fa1  (.x(A_reg[0] & B_reg[1]), .y(A_reg[1] & B_reg[0]), .cin(1'b0),  .s(P[1]),  .cout(C1));
   fa fa2  (.x(A_reg[2] & B_reg[0]), .y(A_reg[1] & B_reg[1]), .cin(C1),    .s(s1),    .cout(C2));
@@ -135,20 +135,20 @@ module tt_um_array_mult_vga (
   // Card (panel behind the text, with padding)
   localparam CARD_X0     = 10'd96;
   localparam CARD_X1     = 10'd544;   // 96 + 448
-  localparam CARD_Y0     = 10'd208-100;
-  localparam CARD_Y1     = 10'd272-100;   // 208 + 64
+  localparam CARD_Y0     = 10'd208-150;
+  localparam CARD_Y1     = 10'd272-150;   // 208 + 64
   localparam BORDER      = 10'd3;
   
-  localparam mult_gap    = 10'd20;
-  localparam bit_size    = 10'd4;
+  localparam mult_gap    = 10'd5;
+  localparam bit_size    = 10'd20;
   localparam bit_gap  = 10'd5;
 
 
   // Text area inside card
   localparam TEXT_X0     = 10'd112;   // (640 − 416) / 2
   localparam TEXT_X1     = 10'd528;   // 112 + 416
-  localparam TEXT_Y0     = 10'd224-100;   // (480 − 32) / 2
-  localparam TEXT_Y1     = 10'd256-100;   // 224 + 32
+  localparam TEXT_Y0     = 10'd224-150;   // (480 − 32) / 2
+  localparam TEXT_Y1     = 10'd256-150;   // 224 + 32
 
   // Character indices for non-digit glyphs
   localparam CH_MUL      = 4'd10;    // '×'
@@ -166,13 +166,16 @@ module tt_um_array_mult_vga (
   wire in_text = (hpos >= TEXT_X0) && (hpos < TEXT_X1)
                && (vpos >= TEXT_Y0) && (vpos < TEXT_Y1);
   wire in_mul_array_x_bound = (hpos >= CARD_X0) && (hpos < CARD_X1);		   
-  wire in_mul_array0 = in_mul_array_x_bound & ((vpos >= CARD_Y1 + mult_gap + 0*(bit_size+bit_gap)) && (vpos <= CARD_Y1 + mult_gap + 1*(bit_size));
-  wire in_mul_array1 = in_mul_array_x_bound & (vpos >= CARD_Y1 + mult_gap + 1*(bit_size+bit_gap)) && (vpos <= CARD_Y1 + mult_gap + 2*(bit_size));
-  wire in_mul_array2 = in_mul_array_x_bound & (vpos >= CARD_Y1 + mult_gap + 2*(bit_size+bit_gap)) && (vpos <= CARD_Y1 + mult_gap + 3*(bit_size));
-  wire in_mul_array3 = in_mul_array_x_bound & (vpos >= CARD_Y1 + mult_gap + 3*(bit_size+bit_gap)) && (vpos <= CARD_Y1 + mult_gap + 4*(bit_size));
-  wire in_mul_array4 = in_mul_array_x_bound & (vpos >= CARD_Y1 + mult_gap + 4*(bit_size+bit_gap)) && (vpos <= CARD_Y1 + mult_gap + 5*(bit_size));
-  wire in_mul_array5 = in_mul_array_x_bound & (vpos >= CARD_Y1 + mult_gap + 5*(bit_size+bit_gap)) && (vpos <= CARD_Y1 + mult_gap + 6*(bit_size));
-  wire in_mul_array6 = in_mul_array_x_bound & (vpos >= CARD_Y1 + mult_gap + 6*(bit_size+bit_gap)) && (vpos <= CARD_Y1 + mult_gap + 7*(bit_size));
+localparam MULT_START = CARD_Y1 + mult_gap;
+
+wire in_mul_array0 = in_mul_array_x_bound && (vpos >= MULT_START + 0*(bit_size+bit_gap)) && (vpos < MULT_START + 0*(bit_size+bit_gap) + bit_size);
+wire in_mul_array1 = in_mul_array_x_bound && (vpos >= MULT_START + 1*(bit_size+bit_gap)) && (vpos < MULT_START + 1*(bit_size+bit_gap) + bit_size);
+wire in_mul_array2 = in_mul_array_x_bound && (vpos >= MULT_START + 2*(bit_size+bit_gap)) && (vpos < MULT_START + 2*(bit_size+bit_gap) + bit_size);
+wire in_mul_array3 = in_mul_array_x_bound && (vpos >= MULT_START + 3*(bit_size+bit_gap)) && (vpos < MULT_START + 3*(bit_size+bit_gap) + bit_size);
+wire in_mul_array4 = in_mul_array_x_bound && (vpos >= MULT_START + 4*(bit_size+bit_gap)) && (vpos < MULT_START + 4*(bit_size+bit_gap) + bit_size);
+wire in_mul_array5 = in_mul_array_x_bound && (vpos >= MULT_START + 5*(bit_size+bit_gap)) && (vpos < MULT_START + 5*(bit_size+bit_gap) + bit_size);
+wire in_mul_array6 = in_mul_array_x_bound && (vpos >= MULT_START + 6*(bit_size+bit_gap)) && (vpos < MULT_START + 6*(bit_size+bit_gap) + bit_size);
+
   
   // Position within the text grid
   wire [9:0] tx = hpos - TEXT_X0;
@@ -361,15 +364,15 @@ module tt_um_array_mult_vga (
         default: begin R = 2'b11; G = 2'b11; B = 2'b11; end
       endcase
     end 
-	else if (in_border) begin R = 2'b01; G = 2'b01; B = 2'b10; end 
-	else if (in_card) begin R = 2'b00; G = 2'b00; B = 2'b01; end 
-	else if (in_mul_array0) begin R = 2'b10; G = 2'b10; B = 2'b10; end 
-	else if (in_mul_array1) begin R = 2'b10; G = 2'b10; B = 2'b11; end 
-	else if (in_mul_array2) begin R = 2'b10; G = 2'b10; B = 2'b11; end 
-	else if (in_mul_array3) begin R = 2'b10; G = 2'b10; B = 2'b10; end 
-	else if (in_mul_array4) begin R = 2'b10; G = 2'b10; B = 2'b11; end 
-	else if (in_mul_array5) begin R = 2'b10; G = 2'b10; B = 2'b10; end 
-	else if (in_mul_array6) begin R = 2'b10; G = 2'b10; B = 2'b11; end 
+    else if (in_border) begin R = 2'b01; G = 2'b01; B = 2'b10; end 
+    else if (in_card) begin R = 2'b00; G = 2'b00; B = 2'b01; end 
+    else if (in_mul_array0) begin R = 2'b00; G = 2'b11; B = 2'b01; end 
+    else if (in_mul_array1) begin R = 2'b00; G = 2'b00; B = 2'b10; end 
+    else if (in_mul_array2) begin R = 2'b10; G = 2'b00; B = 2'b11; end 
+    else if (in_mul_array3) begin R = 2'b10; G = 2'b10; B = 2'b11; end 
+    else if (in_mul_array4) begin R = 2'b10; G = 2'b11; B = 2'b10; end 
+    else if (in_mul_array5)  begin R = 2'b10; G = 2'b11; B = 2'b11; end 
+    else if (in_mul_array6) begin R = 2'b11; G = 2'b11; B = 2'b11; end 
 	
 	else begin R = 2'b00; G = 2'b00; B = 2'b00; end
   end
@@ -379,6 +382,6 @@ module tt_um_array_mult_vga (
   // -----------------------------------------------------------------------
   assign uo_out = {hsync, B[0], G[0], R[0], vsync, B[1], G[1], R[1]};
 
-  wire _unused = &{ena, uio_in[7:1], 1'b0};
+  wire _unused = &{ena, uio_in[7:0], 1'b0};
 
 endmodule
