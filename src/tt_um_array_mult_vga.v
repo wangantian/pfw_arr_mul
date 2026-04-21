@@ -135,15 +135,20 @@ module tt_um_array_mult_vga (
   // Card (panel behind the text, with padding)
   localparam CARD_X0     = 10'd96;
   localparam CARD_X1     = 10'd544;   // 96 + 448
-  localparam CARD_Y0     = 10'd208;
-  localparam CARD_Y1     = 10'd272;   // 208 + 64
+  localparam CARD_Y0     = 10'd208-100;
+  localparam CARD_Y1     = 10'd272-100;   // 208 + 64
   localparam BORDER      = 10'd3;
+  
+  localparam mult_gap    = 10'd20;
+  localparam bit_size    = 4'd3;
+  localparam bit_gap  = 4'd1;
+
 
   // Text area inside card
   localparam TEXT_X0     = 10'd112;   // (640 − 416) / 2
   localparam TEXT_X1     = 10'd528;   // 112 + 416
-  localparam TEXT_Y0     = 10'd224;   // (480 − 32) / 2
-  localparam TEXT_Y1     = 10'd256;   // 224 + 32
+  localparam TEXT_Y0     = 10'd224-100;   // (480 − 32) / 2
+  localparam TEXT_Y1     = 10'd256-100;   // 224 + 32
 
   // Character indices for non-digit glyphs
   localparam CH_MUL      = 4'd10;    // '×'
@@ -160,7 +165,9 @@ module tt_um_array_mult_vga (
 
   wire in_text = (hpos >= TEXT_X0) && (hpos < TEXT_X1)
                && (vpos >= TEXT_Y0) && (vpos < TEXT_Y1);
-
+			   
+  wire in_mul_array = (hpos >= CARD_X0) && (hpos < CARD_X1) && (vpos >= CARD_Y1 + mult_gap) && (vpos <= CARD_Y1 + mult_gap + 7*(bit_size+bit_gap));
+  
   // Position within the text grid
   wire [9:0] tx = hpos - TEXT_X0;
   wire [9:0] ty = vpos - TEXT_Y0;
@@ -339,26 +346,19 @@ module tt_um_array_mult_vga (
   reg [1:0] R, G, B;
 
   always @(*) begin
-    if (!display_on) begin
-      R = 2'b00; G = 2'b00; B = 2'b00;
-
-    end else if (pixel_on) begin
+    if (!display_on) begin R = 2'b00; G = 2'b00; B = 2'b00; end 
+	else if (pixel_on) begin
       case (char_color)
         2'd0:    begin R = 2'b11; G = 2'b00; B = 2'b00; end
         2'd1:    begin R = 2'b00; G = 2'b00; B = 2'b11; end
         2'd2:    begin R = 2'b00; G = 2'b11; B = 2'b00; end
         default: begin R = 2'b11; G = 2'b11; B = 2'b11; end
       endcase
-
-    end else if (in_border) begin
-      R = 2'b01; G = 2'b01; B = 2'b10;
-
-    end else if (in_card) begin
-      R = 2'b00; G = 2'b00; B = 2'b01;
-
-    end else begin
-      R = 2'b00; G = 2'b00; B = 2'b00;
-    end
+    end 
+	else if (in_border) begin R = 2'b01; G = 2'b01; B = 2'b10; end 
+	else if (in_card) begin R = 2'b00; G = 2'b00; B = 2'b01; end 
+	else if (in_mul_array) begin R = 2'b10; G = 2'b10; B = 2'b10; end 
+	else begin R = 2'b00; G = 2'b00; B = 2'b00; end
   end
 
   // -----------------------------------------------------------------------
