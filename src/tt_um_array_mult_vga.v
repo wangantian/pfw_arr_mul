@@ -33,17 +33,14 @@ module tt_um_array_mult_vga (
   // Input registers — directly connected to solder pads on the board
   // -----------------------------------------------------------------------
   reg [3:0] A_reg, B_reg;
-  reg [7:0] P_reg;
 
   always @(posedge clk) begin
     if (!rst_n) begin
       A_reg <= 4'b0;
       B_reg <= 4'b0;
-	  P_reg <= 8'b0;
     end else begin
       A_reg <= ui_in[3:0];
       B_reg <= ui_in[7:4];
-	  P_reg <= P;
     end
   end
 
@@ -84,7 +81,7 @@ module tt_um_array_mult_vga (
   wire [3:0] B_ones = (B_reg >= 4'd10) ? B_reg - 4'd10 : B_reg;
 
   // P (0–225): double-dabble algorithm
-  wire [11:0] P_bcd = bin_to_bcd(P_reg);
+  wire [11:0] P_bcd = bin_to_bcd(P);
   wire [3:0]  P_hundreds = P_bcd[11:8];
   wire [3:0]  P_tens     = P_bcd[7:4];
   wire [3:0]  P_ones     = P_bcd[3:0];
@@ -135,20 +132,19 @@ module tt_um_array_mult_vga (
   // Card (panel behind the text, with padding)
   localparam CARD_X0     = 10'd96;
   localparam CARD_X1     = 10'd544;   // 96 + 448
-  localparam CARD_Y0     = 10'd208-150;
-  localparam CARD_Y1     = 10'd272-150;   // 208 + 64
+  localparam CARD_Y0     = 10'd58;
+  localparam CARD_Y1     = 10'd122;   // 58 + 64
   localparam BORDER      = 10'd3;
-  
+
   localparam mult_gap    = 10'd5;
   localparam bit_size    = 10'd20;
-  localparam bit_gap  = 10'd5;
-
+  localparam bit_gap     = 10'd5;
 
   // Text area inside card
   localparam TEXT_X0     = 10'd112;   // (640 − 416) / 2
   localparam TEXT_X1     = 10'd528;   // 112 + 416
-  localparam TEXT_Y0     = 10'd224-150;   // (480 − 32) / 2
-  localparam TEXT_Y1     = 10'd256-150;   // 224 + 32
+  localparam TEXT_Y0     = 10'd74;
+  localparam TEXT_Y1     = 10'd106;   // 74 + 32
 
   // Character indices for non-digit glyphs
   localparam CH_MUL      = 4'd10;    // '×'
@@ -165,18 +161,19 @@ module tt_um_array_mult_vga (
 
   wire in_text = (hpos >= TEXT_X0) && (hpos < TEXT_X1)
                && (vpos >= TEXT_Y0) && (vpos < TEXT_Y1);
-  wire in_mul_array_x_bound = (hpos >= CARD_X0) && (hpos < CARD_X1);		   
-localparam MULT_START = CARD_Y1 + mult_gap;
 
-wire in_mul_array0 = in_mul_array_x_bound && (vpos >= MULT_START + 0*(bit_size+bit_gap)) && (vpos < MULT_START + 0*(bit_size+bit_gap) + bit_size);
-wire in_mul_array1 = in_mul_array_x_bound && (vpos >= MULT_START + 1*(bit_size+bit_gap)) && (vpos < MULT_START + 1*(bit_size+bit_gap) + bit_size);
-wire in_mul_array2 = in_mul_array_x_bound && (vpos >= MULT_START + 2*(bit_size+bit_gap)) && (vpos < MULT_START + 2*(bit_size+bit_gap) + bit_size);
-wire in_mul_array3 = in_mul_array_x_bound && (vpos >= MULT_START + 3*(bit_size+bit_gap)) && (vpos < MULT_START + 3*(bit_size+bit_gap) + bit_size);
-wire in_mul_array4 = in_mul_array_x_bound && (vpos >= MULT_START + 4*(bit_size+bit_gap)) && (vpos < MULT_START + 4*(bit_size+bit_gap) + bit_size);
-wire in_mul_array5 = in_mul_array_x_bound && (vpos >= MULT_START + 5*(bit_size+bit_gap)) && (vpos < MULT_START + 5*(bit_size+bit_gap) + bit_size);
-wire in_mul_array6 = in_mul_array_x_bound && (vpos >= MULT_START + 6*(bit_size+bit_gap)) && (vpos < MULT_START + 6*(bit_size+bit_gap) + bit_size);
+  // Decorative colored bands below the equation card
+  wire in_mul_array_x_bound = (hpos >= CARD_X0) && (hpos < CARD_X1);
+  localparam MULT_START = CARD_Y1 + mult_gap;
 
-  
+  wire in_mul_array0 = in_mul_array_x_bound && (vpos >= MULT_START + 0*(bit_size+bit_gap)) && (vpos < MULT_START + 0*(bit_size+bit_gap) + bit_size);
+  wire in_mul_array1 = in_mul_array_x_bound && (vpos >= MULT_START + 1*(bit_size+bit_gap)) && (vpos < MULT_START + 1*(bit_size+bit_gap) + bit_size);
+  wire in_mul_array2 = in_mul_array_x_bound && (vpos >= MULT_START + 2*(bit_size+bit_gap)) && (vpos < MULT_START + 2*(bit_size+bit_gap) + bit_size);
+  wire in_mul_array3 = in_mul_array_x_bound && (vpos >= MULT_START + 3*(bit_size+bit_gap)) && (vpos < MULT_START + 3*(bit_size+bit_gap) + bit_size);
+  wire in_mul_array4 = in_mul_array_x_bound && (vpos >= MULT_START + 4*(bit_size+bit_gap)) && (vpos < MULT_START + 4*(bit_size+bit_gap) + bit_size);
+  wire in_mul_array5 = in_mul_array_x_bound && (vpos >= MULT_START + 5*(bit_size+bit_gap)) && (vpos < MULT_START + 5*(bit_size+bit_gap) + bit_size);
+  wire in_mul_array6 = in_mul_array_x_bound && (vpos >= MULT_START + 6*(bit_size+bit_gap)) && (vpos < MULT_START + 6*(bit_size+bit_gap) + bit_size);
+
   // Position within the text grid
   wire [9:0] tx = hpos - TEXT_X0;
   wire [9:0] ty = vpos - TEXT_Y0;
@@ -355,26 +352,25 @@ wire in_mul_array6 = in_mul_array_x_bound && (vpos >= MULT_START + 6*(bit_size+b
   reg [1:0] R, G, B;
 
   always @(*) begin
-    if (!display_on) begin R = 2'b00; G = 2'b00; B = 2'b00; end 
-	else if (pixel_on) begin
+    if (!display_on) begin R = 2'b00; G = 2'b00; B = 2'b00; end
+    else if (pixel_on) begin
       case (char_color)
         2'd0:    begin R = 2'b11; G = 2'b00; B = 2'b00; end
         2'd1:    begin R = 2'b00; G = 2'b00; B = 2'b11; end
         2'd2:    begin R = 2'b00; G = 2'b11; B = 2'b00; end
         default: begin R = 2'b11; G = 2'b11; B = 2'b11; end
       endcase
-    end 
-    else if (in_border) begin R = 2'b01; G = 2'b01; B = 2'b10; end 
-    else if (in_card) begin R = 2'b00; G = 2'b00; B = 2'b01; end 
-    else if (in_mul_array0) begin R = 2'b00; G = 2'b11; B = 2'b01; end 
-    else if (in_mul_array1) begin R = 2'b00; G = 2'b00; B = 2'b10; end 
-    else if (in_mul_array2) begin R = 2'b10; G = 2'b00; B = 2'b11; end 
-    else if (in_mul_array3) begin R = 2'b10; G = 2'b10; B = 2'b11; end 
-    else if (in_mul_array4) begin R = 2'b10; G = 2'b11; B = 2'b10; end 
-    else if (in_mul_array5)  begin R = 2'b10; G = 2'b11; B = 2'b11; end 
-    else if (in_mul_array6) begin R = 2'b11; G = 2'b11; B = 2'b11; end 
-	
-	else begin R = 2'b00; G = 2'b00; B = 2'b00; end
+    end
+    else if (in_border)     begin R = 2'b01; G = 2'b01; B = 2'b10; end
+    else if (in_card)       begin R = 2'b00; G = 2'b00; B = 2'b01; end
+    else if (in_mul_array0) begin R = 2'b00; G = 2'b11; B = 2'b01; end
+    else if (in_mul_array1) begin R = 2'b00; G = 2'b00; B = 2'b10; end
+    else if (in_mul_array2) begin R = 2'b10; G = 2'b00; B = 2'b11; end
+    else if (in_mul_array3) begin R = 2'b10; G = 2'b10; B = 2'b11; end
+    else if (in_mul_array4) begin R = 2'b10; G = 2'b11; B = 2'b10; end
+    else if (in_mul_array5) begin R = 2'b10; G = 2'b11; B = 2'b11; end
+    else if (in_mul_array6) begin R = 2'b11; G = 2'b11; B = 2'b11; end
+    else                    begin R = 2'b00; G = 2'b00; B = 2'b00; end
   end
 
   // -----------------------------------------------------------------------

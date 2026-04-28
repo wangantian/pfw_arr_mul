@@ -47,7 +47,12 @@ async def test_multiplier(dut):
 
     for a, b, expected in test_cases:
         dut.ui_in.value = pack_inputs(a, b)
+        # 1 cycle to latch ui_in into A_reg/B_reg, 1 cycle for P to settle
         await ClockCycles(dut.clk, 2)
-        dut._log.info(f"  {a} x {b} = {expected}  (inputs applied via ui_in)")
+        product = int(dut.user_project.P.value)
+        assert product == expected, (
+            f"{a} x {b}: got {product}, expected {expected}"
+        )
+        dut._log.info(f"  {a} x {b} = {product}  (PASS)")
 
-    dut._log.info("All input combinations applied successfully")
+    dut._log.info("All multiplications verified successfully")
