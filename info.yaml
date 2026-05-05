@@ -20,6 +20,8 @@ project:
     - "bcd2dec_74185.v"
     - "bin2bcd_8bit.v"
     - "mastodon_rom_mini.v"
+    - "mastodon_rom_mini_tiny.v"
+    
     
 
 # Pinout — descriptive names for the datasheet.
