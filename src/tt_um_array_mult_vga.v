@@ -130,10 +130,10 @@ module tt_um_array_mult_vga (
   // -----------------------------------------------------------------------
 
   // Card (panel behind the text, with padding)
-  localparam CARD_X0     = 8'd96;
+  localparam CARD_X0     = 10'd96;
   localparam CARD_X1     = 10'd544;   // 96 + 448
-  localparam CARD_Y0     = 8'd58;
-  localparam CARD_Y1     = 8'd122;   // 58 + 64
+  localparam CARD_Y0     = 10'd58;
+  localparam CARD_Y1     = 10'd122;   // 58 + 64
   localparam BORDER      = 10'd3;
 
   localparam mult_gap    = 10'd5;
@@ -494,7 +494,7 @@ module tt_um_array_mult_vga (
     else if (in_mul_array5_partial) begin R <= 2'b10; G <= 2'b11; B <= 2'b11; end
     else if (in_mul_array6_partial) begin R <= 2'b11; G <= 2'b11; B <= 2'b11; end 
 	else if (in_mul_array_line) begin R <= 2'b11; G <= 2'b11; B <= 2'b11; end 
-	else if (logo_pixels) begin R = pixel_color[7:6]; G = pixel_color[5:4]; B = pixel_color[3:2]; end 
+	else if (logo_pixels) begin R <= pixel_color[7:6]; G <= pixel_color[5:4]; B <= pixel_color[3:2]; end 
     else                    begin R <= 2'b00; G <= 2'b00; B <= 2'b00; end
   end
 
