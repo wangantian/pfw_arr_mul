@@ -81,27 +81,29 @@ module tt_um_array_mult_vga (
   wire [3:0] B_ones = (B_reg >= 4'd10) ? B_reg - 4'd10 : B_reg;
 
   // P (0–225): double-dabble algorithm
-  wire [11:0] P_bcd = bin_to_bcd(P);
-  wire [3:0]  P_hundreds = P_bcd[11:8];
-  wire [3:0]  P_tens     = P_bcd[7:4];
-  wire [3:0]  P_ones     = P_bcd[3:0];
+  wire [11:0] P_bcd;// = bin_to_bcd(P);
+  wire [3:0]  P_hundreds;// = P_bcd[11:8];
+  wire [3:0]  P_tens;//     = P_bcd[7:4];
+  wire [3:0]  P_ones;//     = P_bcd[3:0];
 
-  function [11:0] bin_to_bcd;
-    input [7:0] bin;
-    integer i;
-    reg [19:0] bcd;
-    begin
-      bcd        = 20'd0;
-      bcd[7:0]   = bin;
-      for (i = 0; i < 8; i = i + 1) begin
-        if (bcd[11:8]  >= 5) bcd[11:8]  = bcd[11:8]  + 3;
-        if (bcd[15:12] >= 5) bcd[15:12] = bcd[15:12] + 3;
-        if (bcd[19:16] >= 5) bcd[19:16] = bcd[19:16] + 3;
-        bcd = bcd << 1;
-      end
-      bin_to_bcd = bcd[19:8];
-    end
-  endfunction
+
+bin2bcd_8bit(.X(P_bcd),.Hundred(P_hundreds),.Tens(P_tens),.Ones(P_ones));
+  // function [11:0] bin_to_bcd;
+    // input [7:0] bin;
+    // integer i;
+    // reg [19:0] bcd;
+    // begin
+      // bcd        = 20'd0;
+      // bcd[7:0]   = bin;
+      // for (i = 0; i < 8; i = i + 1) begin
+        // if (bcd[11:8]  >= 5) bcd[11:8]  = bcd[11:8]  + 3;
+        // if (bcd[15:12] >= 5) bcd[15:12] = bcd[15:12] + 3;
+        // if (bcd[19:16] >= 5) bcd[19:16] = bcd[19:16] + 3;
+        // bcd = bcd << 1;
+      // end
+      // bin_to_bcd = bcd[19:8];
+    // end
+  // endfunction
 
   // -----------------------------------------------------------------------
   // VGA sync generator
@@ -286,14 +288,14 @@ module tt_um_array_mult_vga (
 											||((hpos >= CARD_X1-5 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-5 * bit_img_outer)& P23)
 											||((hpos >= CARD_X1-6 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-6 * bit_img_outer)& P33)
 											); 
- wire in_mul_array6_partial = in_mul_array6& (((hpos >= CARD_X1-0 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-0 * bit_img_outer)& S27)
-										    ||((hpos >= CARD_X1-1 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-1 * bit_img_outer)& S26)
-											||((hpos >= CARD_X1-2 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-2 * bit_img_outer)& S25)
-											||((hpos >= CARD_X1-3 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-3 * bit_img_outer)& S24)
-											||((hpos >= CARD_X1-4 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-4 * bit_img_outer)& S23)
-											||((hpos >= CARD_X1-5 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-5 * bit_img_outer)& S22)
-											||((hpos >= CARD_X1-6 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-6 * bit_img_outer)& S21)
-											||((hpos >= CARD_X1-7 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-7 * bit_img_outer)& S20)
+ wire in_mul_array6_partial = in_mul_array6& (((hpos >= CARD_X1-0 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-0 * bit_img_outer)& S20)
+										    ||((hpos >= CARD_X1-1 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-1 * bit_img_outer)& S21)
+											||((hpos >= CARD_X1-2 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-2 * bit_img_outer)& S22)
+											||((hpos >= CARD_X1-3 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-3 * bit_img_outer)& S23)
+											||((hpos >= CARD_X1-4 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-4 * bit_img_outer)& S24)
+											||((hpos >= CARD_X1-5 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-5 * bit_img_outer)& S25)
+											||((hpos >= CARD_X1-6 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-6 * bit_img_outer)& S26)
+											||((hpos >= CARD_X1-7 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-7 * bit_img_outer)& S27)
 											);	 
 											
   // Position within the text grid
@@ -347,126 +349,122 @@ module tt_um_array_mult_vga (
   // -----------------------------------------------------------------------
   // 8×8 bitmap font ROM (digits 0-9, ×, =, space)
   // -----------------------------------------------------------------------
-  wire [7:0] font_data = get_font_row(char_idx, font_row);
+  reg [7:0] font_data;  
   wire       pixel_on  = in_text & font_data[3'd7 - font_col];
+ 
+	always @(*) begin
+      case ({char_idx, font_row})
+        {4'd0, 3'd0}: font_data = 8'h3C;
+        {4'd0, 3'd1}: font_data = 8'h66;
+        {4'd0, 3'd2}: font_data = 8'h6E;
+        {4'd0, 3'd3}: font_data = 8'h76;
+        {4'd0, 3'd4}: font_data = 8'h66;
+        {4'd0, 3'd5}: font_data = 8'h66;
+        {4'd0, 3'd6}: font_data = 8'h3C;
+        {4'd0, 3'd7}: font_data = 8'h00;
 
-  function [7:0] get_font_row;
-    input [3:0] ch;
-    input [2:0] row;
-    begin
-      case ({ch, row})
-        {4'd0, 3'd0}: get_font_row = 8'h3C;
-        {4'd0, 3'd1}: get_font_row = 8'h66;
-        {4'd0, 3'd2}: get_font_row = 8'h6E;
-        {4'd0, 3'd3}: get_font_row = 8'h76;
-        {4'd0, 3'd4}: get_font_row = 8'h66;
-        {4'd0, 3'd5}: get_font_row = 8'h66;
-        {4'd0, 3'd6}: get_font_row = 8'h3C;
-        {4'd0, 3'd7}: get_font_row = 8'h00;
+        {4'd1, 3'd0}: font_data = 8'h18;
+        {4'd1, 3'd1}: font_data = 8'h38;
+        {4'd1, 3'd2}: font_data = 8'h18;
+        {4'd1, 3'd3}: font_data = 8'h18;
+        {4'd1, 3'd4}: font_data = 8'h18;
+        {4'd1, 3'd5}: font_data = 8'h18;
+        {4'd1, 3'd6}: font_data = 8'h7E;
+        {4'd1, 3'd7}: font_data = 8'h00;
 
-        {4'd1, 3'd0}: get_font_row = 8'h18;
-        {4'd1, 3'd1}: get_font_row = 8'h38;
-        {4'd1, 3'd2}: get_font_row = 8'h18;
-        {4'd1, 3'd3}: get_font_row = 8'h18;
-        {4'd1, 3'd4}: get_font_row = 8'h18;
-        {4'd1, 3'd5}: get_font_row = 8'h18;
-        {4'd1, 3'd6}: get_font_row = 8'h7E;
-        {4'd1, 3'd7}: get_font_row = 8'h00;
+        {4'd2, 3'd0}: font_data = 8'h3C;
+        {4'd2, 3'd1}: font_data = 8'h66;
+        {4'd2, 3'd2}: font_data = 8'h06;
+        {4'd2, 3'd3}: font_data = 8'h1C;
+        {4'd2, 3'd4}: font_data = 8'h30;
+        {4'd2, 3'd5}: font_data = 8'h66;
+        {4'd2, 3'd6}: font_data = 8'h7E;
+        {4'd2, 3'd7}: font_data = 8'h00;
 
-        {4'd2, 3'd0}: get_font_row = 8'h3C;
-        {4'd2, 3'd1}: get_font_row = 8'h66;
-        {4'd2, 3'd2}: get_font_row = 8'h06;
-        {4'd2, 3'd3}: get_font_row = 8'h1C;
-        {4'd2, 3'd4}: get_font_row = 8'h30;
-        {4'd2, 3'd5}: get_font_row = 8'h66;
-        {4'd2, 3'd6}: get_font_row = 8'h7E;
-        {4'd2, 3'd7}: get_font_row = 8'h00;
+        {4'd3, 3'd0}: font_data = 8'h3C;
+        {4'd3, 3'd1}: font_data = 8'h66;
+        {4'd3, 3'd2}: font_data = 8'h06;
+        {4'd3, 3'd3}: font_data = 8'h1C;
+        {4'd3, 3'd4}: font_data = 8'h06;
+        {4'd3, 3'd5}: font_data = 8'h66;
+        {4'd3, 3'd6}: font_data = 8'h3C;
+        {4'd3, 3'd7}: font_data = 8'h00;
 
-        {4'd3, 3'd0}: get_font_row = 8'h3C;
-        {4'd3, 3'd1}: get_font_row = 8'h66;
-        {4'd3, 3'd2}: get_font_row = 8'h06;
-        {4'd3, 3'd3}: get_font_row = 8'h1C;
-        {4'd3, 3'd4}: get_font_row = 8'h06;
-        {4'd3, 3'd5}: get_font_row = 8'h66;
-        {4'd3, 3'd6}: get_font_row = 8'h3C;
-        {4'd3, 3'd7}: get_font_row = 8'h00;
+        {4'd4, 3'd0}: font_data = 8'h0C;
+        {4'd4, 3'd1}: font_data = 8'h1C;
+        {4'd4, 3'd2}: font_data = 8'h2C;
+        {4'd4, 3'd3}: font_data = 8'h4C;
+        {4'd4, 3'd4}: font_data = 8'h7E;
+        {4'd4, 3'd5}: font_data = 8'h0C;
+        {4'd4, 3'd6}: font_data = 8'h0C;
+        {4'd4, 3'd7}: font_data = 8'h00;
 
-        {4'd4, 3'd0}: get_font_row = 8'h0C;
-        {4'd4, 3'd1}: get_font_row = 8'h1C;
-        {4'd4, 3'd2}: get_font_row = 8'h2C;
-        {4'd4, 3'd3}: get_font_row = 8'h4C;
-        {4'd4, 3'd4}: get_font_row = 8'h7E;
-        {4'd4, 3'd5}: get_font_row = 8'h0C;
-        {4'd4, 3'd6}: get_font_row = 8'h0C;
-        {4'd4, 3'd7}: get_font_row = 8'h00;
+        {4'd5, 3'd0}: font_data = 8'h7E;
+        {4'd5, 3'd1}: font_data = 8'h60;
+        {4'd5, 3'd2}: font_data = 8'h7C;
+        {4'd5, 3'd3}: font_data = 8'h06;
+        {4'd5, 3'd4}: font_data = 8'h06;
+        {4'd5, 3'd5}: font_data = 8'h66;
+        {4'd5, 3'd6}: font_data = 8'h3C;
+        {4'd5, 3'd7}: font_data = 8'h00;
 
-        {4'd5, 3'd0}: get_font_row = 8'h7E;
-        {4'd5, 3'd1}: get_font_row = 8'h60;
-        {4'd5, 3'd2}: get_font_row = 8'h7C;
-        {4'd5, 3'd3}: get_font_row = 8'h06;
-        {4'd5, 3'd4}: get_font_row = 8'h06;
-        {4'd5, 3'd5}: get_font_row = 8'h66;
-        {4'd5, 3'd6}: get_font_row = 8'h3C;
-        {4'd5, 3'd7}: get_font_row = 8'h00;
+        {4'd6, 3'd0}: font_data = 8'h3C;
+        {4'd6, 3'd1}: font_data = 8'h66;
+        {4'd6, 3'd2}: font_data = 8'h60;
+        {4'd6, 3'd3}: font_data = 8'h7C;
+        {4'd6, 3'd4}: font_data = 8'h66;
+        {4'd6, 3'd5}: font_data = 8'h66;
+        {4'd6, 3'd6}: font_data = 8'h3C;
+        {4'd6, 3'd7}: font_data = 8'h00;
 
-        {4'd6, 3'd0}: get_font_row = 8'h3C;
-        {4'd6, 3'd1}: get_font_row = 8'h66;
-        {4'd6, 3'd2}: get_font_row = 8'h60;
-        {4'd6, 3'd3}: get_font_row = 8'h7C;
-        {4'd6, 3'd4}: get_font_row = 8'h66;
-        {4'd6, 3'd5}: get_font_row = 8'h66;
-        {4'd6, 3'd6}: get_font_row = 8'h3C;
-        {4'd6, 3'd7}: get_font_row = 8'h00;
+        {4'd7, 3'd0}: font_data = 8'h7E;
+        {4'd7, 3'd1}: font_data = 8'h66;
+        {4'd7, 3'd2}: font_data = 8'h06;
+        {4'd7, 3'd3}: font_data = 8'h0C;
+        {4'd7, 3'd4}: font_data = 8'h18;
+        {4'd7, 3'd5}: font_data = 8'h18;
+        {4'd7, 3'd6}: font_data = 8'h18;
+        {4'd7, 3'd7}: font_data = 8'h00;
 
-        {4'd7, 3'd0}: get_font_row = 8'h7E;
-        {4'd7, 3'd1}: get_font_row = 8'h66;
-        {4'd7, 3'd2}: get_font_row = 8'h06;
-        {4'd7, 3'd3}: get_font_row = 8'h0C;
-        {4'd7, 3'd4}: get_font_row = 8'h18;
-        {4'd7, 3'd5}: get_font_row = 8'h18;
-        {4'd7, 3'd6}: get_font_row = 8'h18;
-        {4'd7, 3'd7}: get_font_row = 8'h00;
+        {4'd8, 3'd0}: font_data = 8'h3C;
+        {4'd8, 3'd1}: font_data = 8'h66;
+        {4'd8, 3'd2}: font_data = 8'h66;
+        {4'd8, 3'd3}: font_data = 8'h3C;
+        {4'd8, 3'd4}: font_data = 8'h66;
+        {4'd8, 3'd5}: font_data = 8'h66;
+        {4'd8, 3'd6}: font_data = 8'h3C;
+        {4'd8, 3'd7}: font_data = 8'h00;
 
-        {4'd8, 3'd0}: get_font_row = 8'h3C;
-        {4'd8, 3'd1}: get_font_row = 8'h66;
-        {4'd8, 3'd2}: get_font_row = 8'h66;
-        {4'd8, 3'd3}: get_font_row = 8'h3C;
-        {4'd8, 3'd4}: get_font_row = 8'h66;
-        {4'd8, 3'd5}: get_font_row = 8'h66;
-        {4'd8, 3'd6}: get_font_row = 8'h3C;
-        {4'd8, 3'd7}: get_font_row = 8'h00;
+        {4'd9, 3'd0}: font_data = 8'h3C;
+        {4'd9, 3'd1}: font_data = 8'h66;
+        {4'd9, 3'd2}: font_data = 8'h66;
+        {4'd9, 3'd3}: font_data = 8'h3E;
+        {4'd9, 3'd4}: font_data = 8'h06;
+        {4'd9, 3'd5}: font_data = 8'h66;
+        {4'd9, 3'd6}: font_data = 8'h3C;
+        {4'd9, 3'd7}: font_data = 8'h00;
 
-        {4'd9, 3'd0}: get_font_row = 8'h3C;
-        {4'd9, 3'd1}: get_font_row = 8'h66;
-        {4'd9, 3'd2}: get_font_row = 8'h66;
-        {4'd9, 3'd3}: get_font_row = 8'h3E;
-        {4'd9, 3'd4}: get_font_row = 8'h06;
-        {4'd9, 3'd5}: get_font_row = 8'h66;
-        {4'd9, 3'd6}: get_font_row = 8'h3C;
-        {4'd9, 3'd7}: get_font_row = 8'h00;
+        {4'd10, 3'd0}: font_data = 8'h00;  // '×'
+        {4'd10, 3'd1}: font_data = 8'h66;
+        {4'd10, 3'd2}: font_data = 8'h3C;
+        {4'd10, 3'd3}: font_data = 8'h18;
+        {4'd10, 3'd4}: font_data = 8'h3C;
+        {4'd10, 3'd5}: font_data = 8'h66;
+        {4'd10, 3'd6}: font_data = 8'h00;
+        {4'd10, 3'd7}: font_data = 8'h00;
 
-        {4'd10, 3'd0}: get_font_row = 8'h00;  // '×'
-        {4'd10, 3'd1}: get_font_row = 8'h66;
-        {4'd10, 3'd2}: get_font_row = 8'h3C;
-        {4'd10, 3'd3}: get_font_row = 8'h18;
-        {4'd10, 3'd4}: get_font_row = 8'h3C;
-        {4'd10, 3'd5}: get_font_row = 8'h66;
-        {4'd10, 3'd6}: get_font_row = 8'h00;
-        {4'd10, 3'd7}: get_font_row = 8'h00;
+        {4'd11, 3'd0}: font_data = 8'h00;  // '='
+        {4'd11, 3'd1}: font_data = 8'h00;
+        {4'd11, 3'd2}: font_data = 8'h7E;
+        {4'd11, 3'd3}: font_data = 8'h00;
+        {4'd11, 3'd4}: font_data = 8'h7E;
+        {4'd11, 3'd5}: font_data = 8'h00;
+        {4'd11, 3'd6}: font_data = 8'h00;
+        {4'd11, 3'd7}: font_data = 8'h00;
 
-        {4'd11, 3'd0}: get_font_row = 8'h00;  // '='
-        {4'd11, 3'd1}: get_font_row = 8'h00;
-        {4'd11, 3'd2}: get_font_row = 8'h7E;
-        {4'd11, 3'd3}: get_font_row = 8'h00;
-        {4'd11, 3'd4}: get_font_row = 8'h7E;
-        {4'd11, 3'd5}: get_font_row = 8'h00;
-        {4'd11, 3'd6}: get_font_row = 8'h00;
-        {4'd11, 3'd7}: get_font_row = 8'h00;
-
-        default: get_font_row = 8'h00;         // space + any unused index
+        default: font_data = 8'h00;         // space + any unused index
       endcase
-    end
-  endfunction
+    end 
 
   // -----------------------------------------------------------------------
   // Pixel colour
