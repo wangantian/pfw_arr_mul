@@ -171,11 +171,11 @@ module tt_um_array_mult_vga (
   localparam MULT_START = CARD_Y1 + mult_gap;
   wire [7:0] pixel_color;
   
-  wire logo_pixels = ((hpos > CARD_X0 ) && (hpos <= CARD_X0 + 128)) &&( (vpos > MULT_START + 8*(bit_size+bit_gap) + bit_size) && (vpos <= 128 + MULT_START + 8*(bit_size+bit_gap) + bit_size));
-  wire [9:0] hpos_adj = hpos - CARD_X0;
-  wire [9:0] vpos_adj = vpos -  (MULT_START + 8*(bit_size+bit_gap) + bit_size);
+  // wire logo_pixels = ((hpos > CARD_X0 ) && (hpos <= CARD_X0 + 128)) &&( (vpos > MULT_START + 8*(bit_size+bit_gap) + bit_size) && (vpos <= 128 + MULT_START + 8*(bit_size+bit_gap) + bit_size));
+  // wire [9:0] hpos_adj = hpos - CARD_X0;
+  // wire [9:0] vpos_adj = vpos -  (MULT_START + 8*(bit_size+bit_gap) + bit_size);
   
-   mastodon_rom   mastodon_rom_inst (.x(hpos_adj[6:0]), .y(vpos_adj[6:0]) ,.pixel(pixel_color)); 
+   // mastodon_rom   mastodon_rom_inst (.x(hpos_adj[6:0]), .y(vpos_adj[6:0]) ,.pixel(pixel_color)); 
 
   wire in_mul_array0 = in_mul_array_x_bound && (vpos >= MULT_START + 0*(bit_size+bit_gap)) && (vpos < MULT_START + 0*(bit_size+bit_gap) + bit_size);
   wire in_mul_array1 = in_mul_array_x_bound && (vpos >= MULT_START + 1*(bit_size+bit_gap)) && (vpos < MULT_START + 1*(bit_size+bit_gap) + bit_size);
@@ -494,7 +494,7 @@ module tt_um_array_mult_vga (
     else if (in_mul_array5_partial) begin R <= 2'b10; G <= 2'b11; B <= 2'b11; end
     else if (in_mul_array6_partial) begin R <= 2'b11; G <= 2'b11; B <= 2'b11; end 
 	else if (in_mul_array_line) begin R <= 2'b11; G <= 2'b11; B <= 2'b11; end 
-	else if (logo_pixels) begin R <= pixel_color[7:6]; G <= pixel_color[5:4]; B <= pixel_color[3:2]; end 
+	//else if (logo_pixels) begin R <= pixel_color[7:6]; G <= pixel_color[5:4]; B <= pixel_color[3:2]; end 
     else                    begin R <= 2'b00; G <= 2'b00; B <= 2'b00; end
   end
 
