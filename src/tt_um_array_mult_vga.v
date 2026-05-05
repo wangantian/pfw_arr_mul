@@ -503,6 +503,8 @@ module tt_um_array_mult_vga (
   // -----------------------------------------------------------------------
   assign uo_out = {hsync, B[0], G[0], R[0], vsync, B[1], G[1], R[1]};
 
-  wire _unused = &{ena, uio_in[7:0], 1'b0, pixel_color[1:0], tx[9], ty[9:5], tx[1:0], ty[1:0], hpos_adj[9:7], vpos_adj[9:7]};
+ // wire _unused = &{ena, uio_in[7:0], 1'b0, pixel_color[1:0], tx[9], ty[9:5], tx[1:0], ty[1:0], hpos_adj[9:7], vpos_adj[9:7]};
+
+  wire _unused = &{ena, uio_in[7:0], 1'b0, tx[9], ty[9:5], tx[1:0], ty[1:0]};
 
 endmodule
