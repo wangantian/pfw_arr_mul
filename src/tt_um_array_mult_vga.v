@@ -81,13 +81,13 @@ module tt_um_array_mult_vga (
   wire [3:0] B_ones = (B_reg >= 4'd10) ? B_reg - 4'd10 : B_reg;
 
   // P (0–225): double-dabble algorithm
-  wire [11:0] P_bcd;// = bin_to_bcd(P);
+  //wire [7:0] P_bcd;// = bin_to_bcd(P);
   wire [3:0]  P_hundreds;// = P_bcd[11:8];
   wire [3:0]  P_tens;//     = P_bcd[7:4];
   wire [3:0]  P_ones;//     = P_bcd[3:0];
 
 
-bin2bcd_8bit bin2bcd_8bit_inst(.X(P_bcd),.Hundred(P_hundreds),.Tens(P_tens),.Ones(P_ones));
+bin2bcd_8bit bin2bcd_8bit_inst(.X(P),.Hundred(P_hundreds),.Tens(P_tens),.Ones(P_ones));
   // function [11:0] bin_to_bcd;
     // input [7:0] bin;
     // integer i;
