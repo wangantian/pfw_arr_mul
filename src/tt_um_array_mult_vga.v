@@ -156,7 +156,7 @@ module tt_um_array_mult_vga (
   localparam MULT_START = CARD_Y1 + mult_gap;
   wire [7:0] pixel_color;
   
-  wire logo_pixels = ((hpos > CARD_X0 ) && (hpos <= CARD_X0 + 32)) &&( (vpos > MULT_START + 8*(bit_size+bit_gap) + bit_size) && (vpos <= 32 + MULT_START + 8*(bit_size+bit_gap) + bit_size));
+  wire logo_pixels = ((hpos > CARD_X0 ) && (hpos <= CARD_X0 + 128)) &&( (vpos > MULT_START + 8*(bit_size+bit_gap) + bit_size) && (vpos <= 128+ MULT_START + 8*(bit_size+bit_gap) + bit_size));
   wire [9:0] hpos_adj = hpos - CARD_X0;
   wire [9:0] vpos_adj = vpos -  (MULT_START + 8*(bit_size+bit_gap) + bit_size);
   
