@@ -160,9 +160,10 @@ module tt_um_array_mult_vga (
   wire [9:0] hpos_adj = hpos - CARD_X0;
   wire [9:0] vpos_adj = vpos -  (MULT_START + 8*(bit_size+bit_gap) + bit_size);
   
+  mastodon_rom_compress   mastodon_rom_inst (.x(hpos_adj[6:0]), .y(vpos_adj[6:0]) ,.pixel(pixel_color)); 
   //mastodon_rom   mastodon_rom_inst (.x(hpos_adj[6:0]), .y(vpos_adj[6:0]) ,.pixel(pixel_color)); 
   //mastodon_rom_mini   mastodon_rom_inst (.x(hpos_adj[5:0]), .y(vpos_adj[5:0]) ,.pixel(pixel_color)); 
-  mastodon_rom_tiny   mastodon_rom_inst (.x(hpos_adj[4:0]), .y(vpos_adj[4:0]) ,.pixel(pixel_color)); 
+ // mastodon_rom_tiny   mastodon_rom_inst (.x(hpos_adj[4:0]), .y(vpos_adj[4:0]) ,.pixel(pixel_color)); 
 
   wire in_mul_array0 = in_mul_array_x_bound && (vpos >= MULT_START + 0*(bit_size+bit_gap)) && (vpos < MULT_START + 0*(bit_size+bit_gap) + bit_size);
   wire in_mul_array1 = in_mul_array_x_bound && (vpos >= MULT_START + 1*(bit_size+bit_gap)) && (vpos < MULT_START + 1*(bit_size+bit_gap) + bit_size);
