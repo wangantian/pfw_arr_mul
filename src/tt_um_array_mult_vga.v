@@ -151,6 +151,10 @@ module tt_um_array_mult_vga (
   localparam CH_EQ       = 4'd11;    // '='
   localparam CH_SP       = 4'd12;    // space
 
+  //array multiplier bit display spec 
+  localparam bit_img_outer = 10'd56;
+  localparam bit_img_inner = 10'd48;
+
   // Region flags
   wire in_card = (hpos >= CARD_X0) && (hpos < CARD_X1)
                && (vpos >= CARD_Y0) && (vpos < CARD_Y1);
@@ -173,7 +177,119 @@ module tt_um_array_mult_vga (
   wire in_mul_array4 = in_mul_array_x_bound && (vpos >= MULT_START + 4*(bit_size+bit_gap)) && (vpos < MULT_START + 4*(bit_size+bit_gap) + bit_size);
   wire in_mul_array5 = in_mul_array_x_bound && (vpos >= MULT_START + 5*(bit_size+bit_gap)) && (vpos < MULT_START + 5*(bit_size+bit_gap) + bit_size);
   wire in_mul_array6 = in_mul_array_x_bound && (vpos >= MULT_START + 6*(bit_size+bit_gap)) && (vpos < MULT_START + 6*(bit_size+bit_gap) + bit_size);
+  wire in_mul_array7 = in_mul_array_x_bound && (vpos >= MULT_START + 7*(bit_size+bit_gap)) && (vpos < MULT_START + 7*(bit_size+bit_gap) + bit_size);
+  
+                 // A3  A2  A1  A0
+               // × B3  B2  B1  B0 
+                 // P30 P20 P10 P00
+           // + P31 P21 P11 P01 
+         // S05 S04 S03 S02 S01 S00
+       // + P32 P22 P12 P02 
+     // S16 S15 S14 S13 S12 S11 S10
+// +    P33 P23 P13 P03 
+// S7 S6  S5  S4  S3  S2  S1  S0
 
+ wire P00 =  A_reg[0] & B_reg[0];
+ wire P10 =  A_reg[1] & B_reg[0];
+ wire P20 =  A_reg[2] & B_reg[0]; 
+ wire P30 =  A_reg[3] & B_reg[0];
+ 
+ wire P01 =  A_reg[0] & B_reg[1];
+ wire P11 =  A_reg[1] & B_reg[1];
+ wire P21 =  A_reg[2] & B_reg[1];
+ wire P31 =  A_reg[3] & B_reg[1];
+ 
+ wire P02 =  A_reg[0] & B_reg[2];
+ wire P12 =  A_reg[1] & B_reg[2];
+ wire P22 =  A_reg[2] & B_reg[2];
+ wire P32 =  A_reg[3] & B_reg[2];
+ 
+ wire P03 =  A_reg[0] & B_reg[3];
+ wire P13 =  A_reg[1] & B_reg[3];
+ wire P23 =  A_reg[2] & B_reg[3];
+ wire P33 =  A_reg[3] & B_reg[3];
+ 
+ wire S00 = P[0];
+ wire S01 = P[1];
+ wire S02 = s1;
+ wire S03 = s2;
+ wire S04 = s3;
+ wire S05 = C4;
+ 
+ wire S10 = P[0];
+ wire S11 = P[1];
+ wire S12 = P[2];
+ wire S13 = s4;
+ wire S14 = s5;
+ wire S15 = s6;
+ wire S16 = C8;
+ 
+ wire S27 = P[7];
+ wire S26 = P[6];
+ wire S25 = P[5];
+ wire S24 = P[4];
+ wire S23 = P[3];
+ wire S22 = P[2];
+ wire S21 = P[1];
+ wire S20 = P[0];
+ 
+ wire in_mul_array_line = (in_mul_array0 || in_mul_array1 || in_mul_array2 || in_mul_array3 || in_mul_array4 || in_mul_array5 || in_mul_array6) &&
+							  ((hpos >= CARD_X1-0 * bit_img_outer-2) && (hpos < CARD_X1-0 * bit_img_outer)
+							|| (hpos >= CARD_X1-1 * bit_img_outer-2) && (hpos < CARD_X1-1 * bit_img_outer)
+							|| (hpos >= CARD_X1-2 * bit_img_outer-2) && (hpos < CARD_X1-2 * bit_img_outer)
+							|| (hpos >= CARD_X1-3 * bit_img_outer-2) && (hpos < CARD_X1-3 * bit_img_outer)
+							|| (hpos >= CARD_X1-4 * bit_img_outer-2) && (hpos < CARD_X1-4 * bit_img_outer)
+							|| (hpos >= CARD_X1-5 * bit_img_outer-2) && (hpos < CARD_X1-5 * bit_img_outer)
+							|| (hpos >= CARD_X1-6 * bit_img_outer-2) && (hpos < CARD_X1-6 * bit_img_outer)
+							|| (hpos >= CARD_X1-7 * bit_img_outer-2) && (hpos < CARD_X1-7 * bit_img_outer)
+							);
+ 
+ 
+ wire in_mul_array0_partial = in_mul_array0& (((hpos >= CARD_X1-0 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-0 * bit_img_outer)& P00)
+										    ||((hpos >= CARD_X1-1 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-1 * bit_img_outer)& P10)
+											||((hpos >= CARD_X1-2 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-2 * bit_img_outer)& P20)
+											||((hpos >= CARD_X1-3 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-3 * bit_img_outer)& P30)
+											); 
+ wire in_mul_array1_partial = in_mul_array1& (((hpos >= CARD_X1-1 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-1 * bit_img_outer)& P01)
+										    ||((hpos >= CARD_X1-2 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-2 * bit_img_outer)& P11)
+											||((hpos >= CARD_X1-3 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-3 * bit_img_outer)& P21)
+											||((hpos >= CARD_X1-4 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-4 * bit_img_outer)& P31)
+											); 
+ wire in_mul_array2_partial = in_mul_array2& (((hpos >= CARD_X1-0 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-0 * bit_img_outer)& S00)
+										    ||((hpos >= CARD_X1-1 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-1 * bit_img_outer)& S01)
+											||((hpos >= CARD_X1-2 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-2 * bit_img_outer)& S02)
+											||((hpos >= CARD_X1-3 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-3 * bit_img_outer)& S03)
+											||((hpos >= CARD_X1-4 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-4 * bit_img_outer)& S04)
+											||((hpos >= CARD_X1-5 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-5 * bit_img_outer)& S05)
+											); 
+ wire in_mul_array3_partial = in_mul_array3& (((hpos >= CARD_X1-2 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-2 * bit_img_outer)& P02)
+										    ||((hpos >= CARD_X1-3 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-3 * bit_img_outer)& P12)
+											||((hpos >= CARD_X1-4 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-4 * bit_img_outer)& P22)
+											||((hpos >= CARD_X1-5 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-5 * bit_img_outer)& P32)
+											); 
+ wire in_mul_array4_partial = in_mul_array4& (((hpos >= CARD_X1-0 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-0 * bit_img_outer)& S10)
+										    ||((hpos >= CARD_X1-1 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-1 * bit_img_outer)& S11)
+											||((hpos >= CARD_X1-2 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-2 * bit_img_outer)& S12)
+											||((hpos >= CARD_X1-3 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-3 * bit_img_outer)& S13)
+											||((hpos >= CARD_X1-4 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-4 * bit_img_outer)& S14)
+											||((hpos >= CARD_X1-5 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-5 * bit_img_outer)& S15)
+											||((hpos >= CARD_X1-6 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-6 * bit_img_outer)& S16)
+											);
+ wire in_mul_array5_partial = in_mul_array5& (((hpos >= CARD_X1-3 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-3 * bit_img_outer)& P03)
+										    ||((hpos >= CARD_X1-4 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-4 * bit_img_outer)& P13)
+											||((hpos >= CARD_X1-5 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-5 * bit_img_outer)& P23)
+											||((hpos >= CARD_X1-6 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-6 * bit_img_outer)& P33)
+											); 
+ wire in_mul_array6_partial = in_mul_array6& (((hpos >= CARD_X1-0 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-0 * bit_img_outer)& S27)
+										    ||((hpos >= CARD_X1-1 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-1 * bit_img_outer)& S26)
+											||((hpos >= CARD_X1-2 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-2 * bit_img_outer)& S25)
+											||((hpos >= CARD_X1-3 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-3 * bit_img_outer)& S24)
+											||((hpos >= CARD_X1-4 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-4 * bit_img_outer)& S23)
+											||((hpos >= CARD_X1-5 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-5 * bit_img_outer)& S22)
+											||((hpos >= CARD_X1-6 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-6 * bit_img_outer)& S21)
+											||((hpos >= CARD_X1-7 * bit_img_outer- bit_img_inner) && (hpos < CARD_X1-7 * bit_img_outer)& S20)
+											);	 
+											
   // Position within the text grid
   wire [9:0] tx = hpos - TEXT_X0;
   wire [9:0] ty = vpos - TEXT_Y0;
@@ -363,13 +479,15 @@ module tt_um_array_mult_vga (
     end
     else if (in_border)     begin R = 2'b01; G = 2'b01; B = 2'b10; end
     else if (in_card)       begin R = 2'b00; G = 2'b00; B = 2'b01; end
-    else if (in_mul_array0) begin R = 2'b00; G = 2'b11; B = 2'b01; end
-    else if (in_mul_array1) begin R = 2'b00; G = 2'b00; B = 2'b10; end
-    else if (in_mul_array2) begin R = 2'b10; G = 2'b00; B = 2'b11; end
-    else if (in_mul_array3) begin R = 2'b10; G = 2'b10; B = 2'b11; end
-    else if (in_mul_array4) begin R = 2'b10; G = 2'b11; B = 2'b10; end
-    else if (in_mul_array5) begin R = 2'b10; G = 2'b11; B = 2'b11; end
-    else if (in_mul_array6) begin R = 2'b11; G = 2'b11; B = 2'b11; end
+	
+    else if (in_mul_array0_partial) begin R = 2'b00; G = 2'b11; B = 2'b01; end
+    else if (in_mul_array1_partial) begin R = 2'b00; G = 2'b00; B = 2'b10; end
+    else if (in_mul_array2_partial) begin R = 2'b10; G = 2'b00; B = 2'b11; end
+    else if (in_mul_array3_partial) begin R = 2'b10; G = 2'b10; B = 2'b11; end
+    else if (in_mul_array4_partial) begin R = 2'b10; G = 2'b11; B = 2'b10; end
+    else if (in_mul_array5_partial) begin R = 2'b10; G = 2'b11; B = 2'b11; end
+    else if (in_mul_array6_partial) begin R = 2'b11; G = 2'b11; B = 2'b11; end 
+	else if (in_mul_array_line) begin R = 2'b11; G = 2'b11; B = 2'b11; end 
     else                    begin R = 2'b00; G = 2'b00; B = 2'b00; end
   end
 
