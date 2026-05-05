@@ -10,7 +10,7 @@
  * Outputs:
  *   uo_out     = Tiny VGA PMOD  {hsync, B[0], G[0], R[0], vsync, B[1], G[1], R[1]}
  *
- * The VGA monitor shows "A x B <= P" in large colored decimal digits.
+ * The VGA monitor shows "A x B = P" in large colored decimal digits.
  */
 
 `default_nettype none
@@ -122,7 +122,7 @@ module tt_um_array_mult_vga (
   // -----------------------------------------------------------------------
   // Text rendering — "NN x NN = NNN" centred on screen
   //
-  // 13 character slots, 4× scale  (each chaR <= 32×32 px from 8×8 font)
+  // 13 character slots, 4× scale  (each char = 32×32 px from 8×8 font)
   //   total width  = 13 × 32 = 416 px
   //   total height = 32 px
   //
@@ -152,14 +152,14 @@ module tt_um_array_mult_vga (
   localparam CH_SP       = 4'd12;    // space
 
   //array multiplier bit display spec 
-  localparam bit_img_outeR <= 10'd56;
-  localparam bit_img_inneR <= 10'd48;
+  localparam bit_img_outer = 10'd56;
+  localparam bit_img_inner = 10'd48;
 
   // Region flags
   wire in_card = (hpos >= CARD_X0) && (hpos < CARD_X1)
                && (vpos >= CARD_Y0) && (vpos < CARD_Y1);
 
-  wire in_bordeR <= in_card && (
+  wire in_border = in_card && (
        (hpos < CARD_X0 + BORDER) || (hpos >= CARD_X1 - BORDER) ||
        (vpos < CARD_Y0 + BORDER) || (vpos >= CARD_Y1 - BORDER));
 
@@ -172,10 +172,10 @@ module tt_um_array_mult_vga (
   wire [7:0] pixel_color;
   
   wire logo_pixels = ((hpos > CARD_X0 ) && (hpos <= CARD_X0 + 128)) &&( (vpos > MULT_START + 8*(bit_size+bit_gap) + bit_size) && (vpos <= 128 + MULT_START + 8*(bit_size+bit_gap) + bit_size));
-  wire [9:0] hpos_adj = hpos - CARD_X0;
-  wire [9:0] vpos_adj = vpos -  (MULT_START + 8*(bit_size+bit_gap) + bit_size);
+  wire [6:0] hpos_adj = hpos - CARD_X0;
+  wire [6:0] vpos_adj = vpos -  (MULT_START + 8*(bit_size+bit_gap) + bit_size);
   
-   mastodon_rom   mastodon_rom_inst (.x(hpos_adj[7:0]), .y(vpos_adj[7:0]) ,.pixel(pixel_color)); 
+   mastodon_rom   mastodon_rom_inst (.x(hpos_adj), .y(vpos_adj) ,.pixel(pixel_color)); 
 
   wire in_mul_array0 = in_mul_array_x_bound && (vpos >= MULT_START + 0*(bit_size+bit_gap)) && (vpos < MULT_START + 0*(bit_size+bit_gap) + bit_size);
   wire in_mul_array1 = in_mul_array_x_bound && (vpos >= MULT_START + 1*(bit_size+bit_gap)) && (vpos < MULT_START + 1*(bit_size+bit_gap) + bit_size);
@@ -335,12 +335,12 @@ module tt_um_array_mult_vga (
 
   always @(*) begin
     case (char_slot)
-      4'd0, 4'd1:            char_coloR <= 2'd0;
-      4'd3:                   char_coloR <= 2'd3;
-      4'd5, 4'd6:            char_coloR <= 2'd1;
-      4'd8:                   char_coloR <= 2'd3;
-      4'd10, 4'd11, 4'd12:   char_coloR <= 2'd2;
-      default:                char_coloR <= 2'd3;
+      4'd0, 4'd1:            char_color = 2'd0;
+      4'd3:                   char_color = 2'd3;
+      4'd5, 4'd6:            char_color = 2'd1;
+      4'd8:                   char_color = 2'd3;
+      4'd10, 4'd11, 4'd12:   char_color = 2'd2;
+      default:                char_color = 2'd3;
     endcase
   end
 
@@ -494,7 +494,7 @@ module tt_um_array_mult_vga (
     else if (in_mul_array5_partial) begin R <= 2'b10; G <= 2'b11; B <= 2'b11; end
     else if (in_mul_array6_partial) begin R <= 2'b11; G <= 2'b11; B <= 2'b11; end 
 	else if (in_mul_array_line) begin R <= 2'b11; G <= 2'b11; B <= 2'b11; end 
-	else if (logo_pixels) begin R <= pixel_color[7:6]; G <= pixel_color[5:4]; B <= pixel_color[3:2]; end 
+	else if (logo_pixels) begin R = pixel_color[7:6]; G = pixel_color[5:4]; B = pixel_color[3:2]; end 
     else                    begin R <= 2'b00; G <= 2'b00; B <= 2'b00; end
   end
 
