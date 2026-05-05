@@ -38,6 +38,8 @@ The screen displays the multiplication equation in large coloured decimal digits
 
 Leading zeros are suppressed for clean readability (e.g. `3 x 7 = 21`, not `03 x 07 = 021`).
 
+Below the equation panel, **seven horizontal colored bands** are drawn as a decorative strip that visually represents the structure of the array multiplier. Each band has a distinct color (cyan, blue, magenta, lavender, light green, light cyan, white) to evoke the layered partial-product rows of the multiplication tree.
+
 ## Use
 
 1. Connect the **Tiny VGA PMOD** to the `uo_out` header.
