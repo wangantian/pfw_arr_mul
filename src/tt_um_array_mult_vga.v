@@ -171,8 +171,11 @@ module tt_um_array_mult_vga (
   localparam MULT_START = CARD_Y1 + mult_gap;
   wire [7:0] pixel_color;
   
-  wire logo_pixels = ((hpos > CARD_X0 ) || (hpos <= CARD_X0 + 128) || (vpos > MULT_START + 8*(bit_size+bit_gap) + bit_size) || (vpos <= 128 + MULT_START + 8*(bit_size+bit_gap) + bit_size));
-  mastodon_rom (.x(hpos[6:0]), .y(vpos[6:0]) ,.pixel(pixel_color)); 
+  wire logo_pixels = ((hpos > CARD_X0 ) && (hpos <= CARD_X0 + 128)) &&( (vpos > MULT_START + 8*(bit_size+bit_gap) + bit_size) && (vpos <= 128 + MULT_START + 8*(bit_size+bit_gap) + bit_size));
+  wire [6:0] hpos_adj = hpos - CARD_X0;
+  wire [6:0] vpos_adj = vpos -  (MULT_START + 8*(bit_size+bit_gap) + bit_size);
+  
+   mastodon_rom   mastodon_rom_inst (.x(hpos_adj), .y(vpos_adj) ,.pixel(pixel_color)); 
 
   wire in_mul_array0 = in_mul_array_x_bound && (vpos >= MULT_START + 0*(bit_size+bit_gap)) && (vpos < MULT_START + 0*(bit_size+bit_gap) + bit_size);
   wire in_mul_array1 = in_mul_array_x_bound && (vpos >= MULT_START + 1*(bit_size+bit_gap)) && (vpos < MULT_START + 1*(bit_size+bit_gap) + bit_size);
