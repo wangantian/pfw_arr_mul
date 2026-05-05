@@ -474,7 +474,7 @@ module tt_um_array_mult_vga (
   // -----------------------------------------------------------------------
   reg [1:0] R, G, B;
 
-  always @(*) begin
+  always @(posedge clk) begin
     if (!display_on) begin R = 2'b00; G = 2'b00; B = 2'b00; end
     else if (pixel_on) begin
       case (char_color)
