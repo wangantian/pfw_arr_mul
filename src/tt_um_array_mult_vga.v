@@ -156,11 +156,11 @@ module tt_um_array_mult_vga (
   localparam MULT_START = CARD_Y1 + mult_gap;
   wire [7:0] pixel_color;
   
-  wire logo_pixels = ((hpos > CARD_X0 ) && (hpos <= CARD_X0 + 176)) &&( (vpos > MULT_START + 8*(bit_size+bit_gap) + bit_size) && (vpos <= 128 + MULT_START + 8*(bit_size+bit_gap) + bit_size));
+  wire logo_pixels = ((hpos >= CARD_X0 ) && (hpos < CARD_X0 + 256)) &&( (vpos >= MULT_START + 8*(bit_size+bit_gap) + bit_size) && (vpos < 128 + MULT_START + 8*(bit_size+bit_gap) + bit_size));
   wire [9:0] hpos_adj = hpos - CARD_X0;
   wire [9:0] vpos_adj = vpos -  (MULT_START + 8*(bit_size+bit_gap) + bit_size);
   
-  mastodon_rom_compress   mastodon_rom_inst (.x(hpos_adj[6:0]), .y(vpos_adj[6:0]) ,.pixel(pixel_color)); 
+  mastodon_rom_compress   mastodon_rom_inst (.x(hpos_adj[7:0]), .y(vpos_adj[6:0]) ,.pixel(pixel_color)); 
   //mastodon_rom   mastodon_rom_inst (.x(hpos_adj[6:0]), .y(vpos_adj[6:0]) ,.pixel(pixel_color)); 
   //mastodon_rom_mini   mastodon_rom_inst (.x(hpos_adj[5:0]), .y(vpos_adj[5:0]) ,.pixel(pixel_color)); 
  // mastodon_rom_tiny   mastodon_rom_inst (.x(hpos_adj[4:0]), .y(vpos_adj[4:0]) ,.pixel(pixel_color)); 
