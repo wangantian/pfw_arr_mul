@@ -3,7 +3,7 @@ project:
   title:       "4x4 Array Multiplier with VGA Visualization"
   author:      "Carlos Acevedo, Brock Fuller, Akshat Verma, Vance Vojslavek, Hira Memon, Ezenwa Opara, Erik Rodriguez, Samiya Qasmi, Sahil Najmal, Matthew Hodges"           # <-- fill in your name
   discord:     ""                    # optional
-  description: "A structural 4x4 array multiplier (12 full adders) that displays the operands and 8-bit product as a decimal equation on a 640x480 VGA monitor via the Tiny VGA PMOD. Inputs are bare solder pads for direct cable connection."
+  description: "A structural 4×4 array multiplier using 12 full adders that displays the input operands and the resulting 8-bit product as a decimal equation on a 640×480 VGA monitor through the Tiny VGA PMOD. The designers’ initials and the Purdue Fort Wayne mascot, the mastodon, are also shown on the display. Inputs are provided through bare solder pads for direct cable connections."
   language:    "Verilog"
   clock_hz:    25000000              # 25 MHz required for VGA
 
@@ -15,8 +15,7 @@ project:
   source_files:
     - "tt_um_array_mult_vga.v"
     - "hvsync_generator.v"
-    - "fa.v"
-    - "mastodon_rom.v"
+    - "fa.v" 
     - "bcd2dec_74185.v"
     - "bin2bcd_8bit.v" 
     - "mastodon_rom_compress.v"

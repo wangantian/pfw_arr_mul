@@ -11,6 +11,7 @@
  *   uo_out     = Tiny VGA PMOD  {hsync, B[0], G[0], R[0], vsync, B[1], G[1], R[1]}
  *
  * The VGA monitor shows "A x B = P" in large colored decimal digits.
+ * A set of blocks is displayed below to show the value of the multiplication results and the partial submission results. 
  */
 
 `default_nettype none
@@ -161,9 +162,6 @@ module tt_um_array_mult_vga (
   wire [9:0] vpos_adj = vpos -  (MULT_START + 8*(bit_size+bit_gap) + bit_size);
   
   mastodon_rom_compress   mastodon_rom_inst (.x(hpos_adj[7:0]), .y(vpos_adj[6:0]) ,.pixel(pixel_color)); 
-  //mastodon_rom   mastodon_rom_inst (.x(hpos_adj[6:0]), .y(vpos_adj[6:0]) ,.pixel(pixel_color)); 
-  //mastodon_rom_mini   mastodon_rom_inst (.x(hpos_adj[5:0]), .y(vpos_adj[5:0]) ,.pixel(pixel_color)); 
- // mastodon_rom_tiny   mastodon_rom_inst (.x(hpos_adj[4:0]), .y(vpos_adj[4:0]) ,.pixel(pixel_color)); 
 
   wire in_mul_array0 = in_mul_array_x_bound && (vpos >= MULT_START + 0*(bit_size+bit_gap)) && (vpos < MULT_START + 0*(bit_size+bit_gap) + bit_size);
   wire in_mul_array1 = in_mul_array_x_bound && (vpos >= MULT_START + 1*(bit_size+bit_gap)) && (vpos < MULT_START + 1*(bit_size+bit_gap) + bit_size);
@@ -485,9 +483,7 @@ module tt_um_array_mult_vga (
   // -----------------------------------------------------------------------
   // Tiny VGA PMOD output
   // -----------------------------------------------------------------------
-  assign uo_out = {hsync, B[0], G[0], R[0], vsync, B[1], G[1], R[1]};
-
- // wire _unused = &{ena, uio_in[7:0], 1'b0, pixel_color[1:0], tx[9], ty[9:5], tx[1:0], ty[1:0], hpos_adj[9:7], vpos_adj[9:7]};
+  assign uo_out = {hsync, B[0], G[0], R[0], vsync, B[1], G[1], R[1]}; 
 
   wire _unused = &{ena, uio_in[7:0], 1'b0, tx[9], ty[9:5], tx[1:0], ty[1:0]};
 
